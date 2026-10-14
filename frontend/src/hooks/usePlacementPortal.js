@@ -8,7 +8,6 @@ export default function usePlacementPortal() {
   const [savedJobs, setSavedJobs] = useState([]);
   const [employerJobs, setEmployerJobs] = useState([]);
   const [applicants, setApplicants] = useState({});
-  const [activeTab, setActiveTab] = useState('Discover');
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [sortOrder, setSortOrder] = useState('recommended');
@@ -16,7 +15,6 @@ export default function usePlacementPortal() {
   const [workMode, setWorkMode] = useState('');
   const [modal, setModal] = useState('');
   const [applyJob, setApplyJob] = useState(null);
-  const [detailJob, setDetailJob] = useState(null);
   const [pendingApply, setPendingApply] = useState(null);
   const [notice, setNotice] = useState('');
   const [loading, setLoading] = useState(true);
@@ -24,6 +22,7 @@ export default function usePlacementPortal() {
   const [hasMore, setHasMore] = useState(false);
   const [page, setPage] = useState(1);
   const [error, setError] = useState('');
+  const [authReady, setAuthReady] = useState(false);
 
   const loadJobs = useCallback(async (requestedPage = 1) => {
     if (requestedPage === 1) setLoading(true);
@@ -73,20 +72,18 @@ export default function usePlacementPortal() {
   useEffect(() => {
     api('/auth/me').then((result) => {
       setUser(result.user);
-      loadUserData(result.user);
+      return loadUserData(result.user);
     }).catch((err) => {
       if (err.message !== 'Please sign in to continue.' && err.message !== 'Your session has expired. Please sign in again.') setNotice(err.message);
-    });
+    }).finally(() => setAuthReady(true));
   }, [loadUserData]);
 
   const appliedIds = useMemo(() => new Set(applications.map((application) => application.job?._id)), [applications]);
   const savedIds = useMemo(() => new Set(savedJobs.map((job) => job._id)), [savedJobs]);
-  const visibleJobs = activeTab === 'Saved' ? savedJobs : jobs;
 
   const onAuthSuccess = (nextUser) => {
     setUser(nextUser);
     setModal('');
-    setActiveTab(nextUser.role === 'employer' ? 'My listings' : 'Discover');
     loadUserData(nextUser);
     if (pendingApply && nextUser.role === 'student') {
       setApplyJob(pendingApply);
@@ -98,7 +95,6 @@ export default function usePlacementPortal() {
   };
 
   const beginApply = (job) => {
-    setDetailJob(null);
     if (user?.role === 'employer') return setNotice('Switch to a student account to apply for opportunities.');
     if (appliedIds.has(job._id)) return;
     if (!user) {
@@ -117,9 +113,10 @@ export default function usePlacementPortal() {
       setSavedJobs([]);
       setEmployerJobs([]);
       setApplicants({});
-      setActiveTab('Discover');
+      return true;
     } catch (err) {
       setNotice(err.message);
+      return false;
     }
   };
 
@@ -158,7 +155,6 @@ export default function usePlacementPortal() {
   const onJobCreated = (job) => {
     setEmployerJobs((previous) => [{ ...job, applicationCount: 0 }, ...previous]);
     setApplicants((previous) => ({ ...previous, [job._id]: [] }));
-    setActiveTab('My listings');
     setNotice('Your opportunity is live. Thanks for helping someone take a first step!');
   };
 
@@ -173,11 +169,11 @@ export default function usePlacementPortal() {
   };
 
   return {
-    user, jobs, applications, savedJobs, employerJobs, applicants, activeTab, setActiveTab,
+    user, jobs, applications, savedJobs, employerJobs, applicants, authReady,
     search, setSearch, searchInput, setSearchInput, sortOrder, setSortOrder, category, setCategory,
-    workMode, setWorkMode, modal, setModal, applyJob, setApplyJob, detailJob, setDetailJob,
+    workMode, setWorkMode, modal, setModal, applyJob, setApplyJob,
     notice, setNotice, loading, loadingMore, hasMore, page, error, loadJobs, loadUserData,
-    appliedIds, savedIds, visibleJobs, onAuthSuccess, beginApply, signOut, saveJob,
+    appliedIds, savedIds, onAuthSuccess, beginApply, signOut, saveJob,
     changeApplicationStatus, changeListingStatus, onJobCreated, onApplicationSubmitted
   };
 }

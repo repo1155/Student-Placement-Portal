@@ -4,11 +4,21 @@ import StatusPill from '../../components/StatusPill';
 import { companyColors, initials } from '../../utils/presentation';
 
 export default function StudentDashboard({ applications, onDiscover }) {
+  const activeCount = applications.filter((application) => ['submitted', 'reviewing', 'interview'].includes(application.status)).length;
+  const interviewCount = applications.filter((application) => application.status === 'interview').length;
+  const offerCount = applications.filter((application) => application.status === 'offer').length;
+
   return <main className="dashboard-main">
     <div className="dashboard-heading">
       <div><div className="eyebrow">YOUR CAREER JOURNEY</div><h1>My applications<span className="brand-dot">.</span></h1><p>Every next step begins with the one you took.</p></div>
       <span className="dashboard-count">{applications.length} applications</span>
     </div>
+    <section className="dashboard-stats" aria-label="Application overview">
+      <article><span>Total applications</span><strong>{applications.length}</strong><small>Every opportunity you pursued</small></article>
+      <article><span>In progress</span><strong>{activeCount}</strong><small>Submitted, reviewing, or interview</small></article>
+      <article><span>Interviews</span><strong>{interviewCount}</strong><small>Conversations about what’s next</small></article>
+      <article><span>Offers</span><strong>{offerCount}</strong><small>New chapters taking shape</small></article>
+    </section>
     {applications.length ? <div className="application-list">
       {applications.map((application, index) => <article className="application-row" key={application._id}>
         <div className={`company-logo ${companyColors[index % companyColors.length]}`}>

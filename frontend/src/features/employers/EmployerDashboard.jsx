@@ -6,6 +6,10 @@ import { initials } from '../../utils/presentation';
 
 export default function EmployerDashboard({ jobs, applicants, onCreate, onNotice, onListingStatus, onApplicationStatus }) {
   const [updatingListings, setUpdatingListings] = useState({});
+  const applicantList = Object.values(applicants).flat();
+  const openCount = jobs.filter((job) => job.status === 'open').length;
+  const interviewCount = applicantList.filter((application) => application.status === 'interview').length;
+  const offerCount = applicantList.filter((application) => application.status === 'offer').length;
 
   async function updateListing(job, status) {
     setUpdatingListings((previous) => ({ ...previous, [job._id]: true }));
@@ -24,6 +28,12 @@ export default function EmployerDashboard({ jobs, applicants, onCreate, onNotice
       <div><div className="eyebrow">TALENT STARTS HERE</div><h1>Your listings<span className="brand-dot">.</span></h1><p>Help someone find their first yes.</p></div>
       <Button onClick={onCreate}><Plus size={17} /> Post a role</Button>
     </div>
+    <section className="dashboard-stats" aria-label="Hiring overview">
+      <article><span>All listings</span><strong>{jobs.length}</strong><small>Opportunities you’ve created</small></article>
+      <article><span>Open roles</span><strong>{openCount}</strong><small>Currently accepting applications</small></article>
+      <article><span>Applicants</span><strong>{applicantList.length}</strong><small>Candidates in your pipeline</small></article>
+      <article><span>Interviews & offers</span><strong>{interviewCount + offerCount}</strong><small>{interviewCount} interviews · {offerCount} offers</small></article>
+    </section>
     {jobs.length ? <div className="employer-listings">
       {jobs.map((job) => {
         const jobApplicants = applicants[job._id] || [];

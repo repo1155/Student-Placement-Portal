@@ -8,6 +8,7 @@ const authRoutes = require('./routes/auth');
 const jobRoutes = require('./routes/jobs');
 const applicationRoutes = require('./routes/applications');
 const savedRoutes = require('./routes/saved');
+const practiceRoutes = require('./routes/practice');
 const { notFound, errorHandler } = require('./middleware/errors');
 
 const app = express();
@@ -20,12 +21,17 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '32kb' }));
 app.use(cookieParser());
+app.get('/', (req, res) => {
+  const websiteUrl = config.clientOrigin.split(',')[0].trim();
+  res.redirect(302, websiteUrl);
+});
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/api/auth', rateLimit({ windowMs: 15 * 60 * 1000, limit: 60, standardHeaders: 'draft-7', legacyHeaders: false }));
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/saved', savedRoutes);
+app.use('/api/practice', practiceRoutes);
 app.use(notFound);
 app.use(errorHandler);
 

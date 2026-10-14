@@ -6,6 +6,7 @@ A responsive student-to-employer placement portal built with React, Express, and
 
 - **Student accounts:** secure registration and sign-in, profile basics, searchable/filterable internships and co-ops, saved roles, applications with an optional resume link and cover note, and live application statuses.
 - **Employer accounts:** company-linked accounts, role publishing and closing, applicant lists, resume links, and status updates (submitted, in review, interview, offer, or not selected).
+- **Student practice:** newly generated, parameterized aptitude, logical reasoning, verbal ability, and programming fundamentals quizzes with topic focus, quick/standard/mock lengths, server-scored answers, explanations, and saved progress. Question prompts are fingerprinted per student to avoid repeats while eligible variations remain; answer keys remain server-side.
 - **Platform basics:** server-side validation, HTTP-only JWT session cookies, password hashing, role checks, rate-limited authentication, security headers, CORS allow-list, responsive layout, health endpoint, and MongoDB indexes.
 - **Seed data:** six sample opportunities for local evaluation. These are fictional sample listings and should be removed before public launch.
 
@@ -61,6 +62,22 @@ For standalone hosting, set `VITE_API_URL` at frontend build time to the API ori
 - `frontend/src/features/` groups product screens and forms by workflow: opportunity discovery, student applications, employer hiring, and authentication.
 - `frontend/src/hooks/usePlacementPortal.js` owns shared portal state and API actions; `App.jsx` composes the screens and dialogs.
 
+## Site routes
+
+- `/` — discover and search opportunities.
+- `/jobs/:id` — view a single opportunity.
+- `/saved` — student shortlist (sign-in required).
+- `/applications` — student application tracker (sign-in required).
+- `/practice` — timed skill practice, explanations, and progress history (student sign-in required).
+- `/practice/quiz/:category/:mode/:topic?` — start a quick, standard, or mock timed practice set, optionally focused on one topic.
+- `/practice/attempt/:id` — resume a timed attempt.
+- `/practice/results/:id` — review a completed attempt and explanations.
+- `/employer/listings` — employer listings and applicant management (employer sign-in required).
+
+The frontend supports direct links and browser back/forward navigation. The included Nginx config falls back to the app entry point for these routes.
+
+The API is available on port `5000` during local development. Opening its root URL redirects to the configured frontend (`CLIENT_ORIGIN`); open the frontend on port `5173` or the Docker site on port `8080` to use the website.
+
 ## Production deployment checklist
 
 The repository provides production builds and container images; a real launch still requires environment-specific operations:
@@ -91,10 +108,15 @@ The repository provides production builds and container images; a real launch st
 | `GET` | `/api/applications/mine` | Student | Track submitted applications |
 | `PATCH` | `/api/applications/:id/status` | Listing owner | Update application status |
 | `GET`, `POST`, `DELETE` | `/api/saved`, `/api/saved/:jobId` | Student | List, save, and unsave opportunities |
+| `GET` | `/api/practice/categories` | Public | List original practice tracks, focus topics, and quiz modes |
+| `POST` | `/api/practice/attempts` | Student | Start a quick (5), standard (10), or mock (15) timed quiz; optional `topic` |
+| `GET` | `/api/practice/attempts/mine` | Student | Review practice history |
+| `GET` | `/api/practice/attempts/:id` | Attempt owner | Resume a quiz or review its result |
+| `POST` | `/api/practice/attempts/:id/submit` | Attempt owner | Score a quiz and return explanations |
 
 ## Checks
 
 ```sh
 cd backend && npm test
-cd frontend && npm run build
+cd frontend && npm test && npm run build
 ```

@@ -56,23 +56,21 @@ function OpportunitySearch({ searchInput, setSearchInput, onSearch, workMode, se
   </div>;
 }
 
-function EmptyResults({ isSaved, onClear }) {
+function EmptyResults({ onClear }) {
   return <div className="empty-opportunities">
     <div className="empty-icon"><Search /></div>
-    <h3>{isSaved ? 'No saved roles just yet.' : 'No roles match those filters.'}</h3>
-    <p>{isSaved ? 'Tap the bookmark on a role to keep it close.' : 'Try a different search, or clear your filters.'}</p>
+    <h3>No roles match those filters.</h3>
+    <p>Try a different search, or clear your filters.</p>
     <button onClick={onClear}>Clear filters <ArrowRight size={15} /></button>
   </div>;
 }
 
 export default function DiscoverPage({
-  user, activeTab, setActiveTab, jobs, visibleJobs, savedJobs, savedIds, appliedIds,
+  user, jobs, savedIds, appliedIds,
   onSaveJob, onViewJob, searchInput, setSearchInput, setSearch, category, setCategory,
   workMode, setWorkMode, sortOrder, setSortOrder, error, onRetry, loading,
-  loadingMore, hasMore, page, onLoadMore, onCreateJob, onRegister
+  loadingMore, hasMore, page, onLoadMore, onCreateJob, onRegister, onSaved
 }) {
-  const isSaved = activeTab === 'Saved';
-
   return <main>
     <Hero />
     <section className="opportunity-section" id="opportunities">
@@ -92,10 +90,10 @@ export default function DiscoverPage({
       />
       <div className="category-row">
         <div className="category-tabs">{categories.map((item) => <button key={item} className={category === item ? 'selected' : ''} onClick={() => setCategory(item)}>{item}</button>)}</div>
-        {user?.role === 'student' && <button className={`saved-filter ${isSaved ? 'active' : ''}`} onClick={() => setActiveTab(isSaved ? 'Discover' : 'Saved')}><Heart size={15} /> Saved <span>{savedJobs.length}</span></button>}
+        {user?.role === 'student' && <button className="saved-filter" onClick={onSaved}><Heart size={15} /> Saved opportunities</button>}
       </div>
       <div className="listings-heading">
-        <div><span className="listing-counter">{isSaved ? savedJobs.length : jobs.length}</span> {isSaved ? 'saved for later' : 'roles worth a look'}</div>
+        <div><span className="listing-counter">{jobs.length}</span> roles worth a look</div>
         <label className="sort-button">Sort by
           <select value={sortOrder} onChange={(event) => setSortOrder(event.target.value)} aria-label="Sort opportunities">
             <option value="recommended">Recommended</option><option value="recent">Recently added</option>
@@ -104,8 +102,8 @@ export default function DiscoverPage({
         </label>
       </div>
       {error && <div className="error-banner" role="alert"><span>{error}</span><button onClick={onRetry}>Try again</button></div>}
-      {loading ? <div className="loading-state"><span className="spinner" />Finding your next opportunity…</div> : visibleJobs.length ?
-        <div className="jobs-grid">{visibleJobs.map((job, index) => <JobCard
+      {loading ? <div className="loading-state"><span className="spinner" />Finding your next opportunity…</div> : jobs.length ?
+        <div className="jobs-grid">{jobs.map((job, index) => <JobCard
           key={job._id}
           job={job}
           index={index}
@@ -114,14 +112,13 @@ export default function DiscoverPage({
           onSave={onSaveJob}
           onView={onViewJob}
         />)}</div> :
-        <EmptyResults isSaved={isSaved} onClear={() => {
+        <EmptyResults onClear={() => {
           setSearch('');
           setSearchInput('');
           setCategory('All roles');
           setWorkMode('');
-          setActiveTab('Discover');
         }} />}
-      {!loading && !isSaved && hasMore && <div className="load-more-wrap">
+      {!loading && hasMore && <div className="load-more-wrap">
         <Button variant="outline" disabled={loadingMore} onClick={() => onLoadMore(page + 1)}>{loadingMore ? 'Loading…' : 'Show more opportunities'} <ArrowDown size={15} /></Button>
       </div>}
       <div className="career-note">
