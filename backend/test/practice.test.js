@@ -1,5 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const PracticeAttempt = require('../src/models/PracticeAttempt');
 const { categories, generateQuestions, publicQuestion } = require('../src/practice/questions');
 
 test('every practice category generates valid, unexposed questions', () => {
@@ -44,4 +45,31 @@ test('every topic can generate a unique mock-assessment set', () => {
 
 test('topic filters reject unknown topics without generating a mixed set', () => {
   assert.equal(generateQuestions('quantitative-aptitude', 5, new Set(), 'Unknown topic'), null);
+});
+
+test('public question serialization preserves fields from Mongoose question snapshots', () => {
+  const attempt = new PracticeAttempt({
+    student: '507f1f77bcf86cd799439011',
+    category: 'quantitative-aptitude',
+    questionIds: ['question-1'],
+    questions: [{
+      id: 'question-1',
+      questionKey: 'fingerprint',
+      topic: 'Percentages',
+      difficulty: 'easy',
+      prompt: 'What is 10% of 50?',
+      options: ['5', '10', '15', '20'],
+      correctOption: 0,
+      explanation: 'Multiply 50 by 0.1.',
+    }],
+    startedAt: new Date(),
+    expiresAt: new Date(Date.now() + 60_000)
+  });
+
+  const serialized = publicQuestion(attempt.questions[0]);
+  assert.deepEqual(serialized.options, ['5', '10', '15', '20']);
+  assert.equal(serialized.prompt, 'What is 10% of 50?');
+  assert.equal(Object.hasOwn(serialized, 'correctOption'), false);
+  assert.equal(Object.hasOwn(serialized, 'explanation'), false);
+  assert.equal(Object.hasOwn(serialized, 'questionKey'), false);
 });

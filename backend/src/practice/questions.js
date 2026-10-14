@@ -475,7 +475,8 @@ function getCategory(categoryId) {
 }
 
 function publicQuestion(question) {
-  const { correctOption, explanation, questionKey, ...publicFields } = question;
+  const source = typeof question.toObject === 'function' ? question.toObject() : question;
+  const { correctOption, explanation, questionKey, ...publicFields } = source;
   return publicFields;
 }
 

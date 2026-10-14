@@ -39,6 +39,15 @@ export default function PracticeQuizPage({ category, mode = 'standard', topic = 
           onNavigate(`/practice/results/${result.attempt.id}`, { replace: true });
           return;
         }
+        if (!Array.isArray(result.attempt.questions) || result.attempt.questions.length === 0
+          || result.attempt.questions.some((question) => (
+            !Array.isArray(question.options)
+            || question.options.length !== 4
+            || question.options.some((option) => typeof option !== 'string')
+          ))) {
+          setError('This practice attempt has incomplete question data. Return to practice and start a fresh set.');
+          return;
+        }
         setAttempt(result.attempt);
         attemptRef.current = result.attempt;
         setAnswers(Object.fromEntries((result.attempt.responses || []).map(({ questionId, selectedOption }) => [questionId, selectedOption])));
