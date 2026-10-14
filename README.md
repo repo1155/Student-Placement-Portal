@@ -56,6 +56,12 @@ The API requires `MONGODB_URI` and `JWT_SECRET`. `CLIENT_ORIGIN` is the exact al
 
 For standalone hosting, set `VITE_API_URL` at frontend build time to the API origin. For the included Nginx deployment, the frontend and API share one origin and `/api` is proxied internally.
 
+## Deploy with Vercel and Render
+
+The `render.yaml` blueprint creates the Docker-based API service. In the Render dashboard, connect this repository as a Blueprint and provide `MONGODB_URI` for a reachable MongoDB database and `CLIENT_ORIGIN` set to the Vercel site origin. Render generates `JWT_SECRET` for the service.
+
+Import the `frontend/` directory as the Vercel project root. The included `frontend/vercel.json` proxies `/api/*` through the Render service so browser requests and secure session cookies remain on the Vercel site origin. If Render assigns a different service hostname, update the API rewrite destination in `frontend/vercel.json` to that service's `/api/:path*` URL, then redeploy Vercel. The site includes a Pathway SVG favicon and displays its compass mark in the header.
+
 ## Frontend structure
 
 - `frontend/src/components/` contains reusable site-wide UI such as buttons, dialogs, navigation, job cards, and status labels.
