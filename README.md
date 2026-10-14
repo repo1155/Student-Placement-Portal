@@ -51,7 +51,7 @@ The Vite development server proxies `/api` to `http://localhost:5000`. Start the
 
 ## Configuration
 
-The API requires `MONGODB_URI` and `JWT_SECRET`. `CLIENT_ORIGIN` is the exact allowed frontend origin (a comma-separated list is supported for multiple trusted origins); `PORT` defaults to `5000`. Compose initializes MongoDB with root credentials from `.env`, publishes its port on loopback for API connectivity, and connects the API through the Docker host gateway. Set `MONGODB_URI` to a managed database connection string when deploying externally. URL-encode credentials embedded in MongoDB URIs. In production, set `NODE_ENV=production` so session cookies are marked `Secure`, terminate TLS in front of the API, and set `CLIENT_ORIGIN` to the deployed frontend origin.
+The API requires `MONGODB_URI` and `JWT_SECRET`. `CLIENT_ORIGIN` is the exact allowed frontend origin (a comma-separated list is supported for multiple trusted origins); `PORT` defaults to `5000`. Compose initializes MongoDB with root credentials from `.env` and connects the API to the MongoDB service over Docker's internal network. MongoDB's port is published on loopback for local tools. Set `MONGODB_URI` to a managed database connection string when deploying externally. URL-encode credentials embedded in MongoDB URIs. In production, set `NODE_ENV=production` so session cookies are marked `Secure`, terminate TLS in front of the API, and set `CLIENT_ORIGIN` to the deployed frontend origin.
 
 For standalone hosting, set `VITE_API_URL` at frontend build time to the API origin. For the included Nginx deployment, the frontend and API share one origin and `/api` is proxied internally.
 
