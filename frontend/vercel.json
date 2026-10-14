@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://student-placement-portal-api.onrender.com/api/:path*"
+      "destination": "https://student-placement-portal-dzu8.onrender.com/api/:path*"
     },
     {
       "source": "/(.*)",
