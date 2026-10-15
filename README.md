@@ -8,7 +8,7 @@ A responsive student-to-employer placement portal built with React, Express, and
 - **Employer accounts:** company-linked accounts, role publishing and closing, applicant lists, resume links, and status updates (submitted, in review, interview, offer, or not selected).
 - **Student practice:** newly generated, parameterized aptitude, logical reasoning, verbal ability, and programming fundamentals quizzes with topic focus, quick/standard/mock lengths, server-scored answers, explanations, and saved progress. Question prompts are fingerprinted per student to avoid repeats while eligible variations remain; answer keys remain server-side.
 - **Platform basics:** server-side validation, HTTP-only JWT session cookies, password hashing, role checks, rate-limited authentication, security headers, CORS allow-list, responsive layout, health endpoint, and MongoDB indexes.
-- **Seed data:** six sample opportunities for local evaluation. These are fictional sample listings and should be removed before public launch.
+- **Seed data:** fourteen sample opportunities for local evaluation. These are fictional sample listings and should be removed before public launch.
 
 The feature set follows familiar career-marketplace conventions such as keyword/category/work-style discovery, saved searches/roles, application status visibility, and employer applicant workflows. Career-readiness content references [NACE's career readiness competencies](https://www.naceweb.org/career-readiness/competencies/career-readiness-defined).
 
